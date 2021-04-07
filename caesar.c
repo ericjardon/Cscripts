@@ -2,27 +2,27 @@
 #include <stdlib.h>
 #include <string.h>
 int key;
-#define ALPHABET_SIZE 126 // upper limit to ascii table
+#define ALPHABET_SIZE 95 // upper limit to ascii table: 127-32
 
 /*Valid ASCII codes go from 32 to 126*/
-char c(char x) {
-    printf("x: %d\t", x);
+int c(int x) {
+    //printf("x: %d\t", x);
+    x -= 32;
     char y = (x+key)%ALPHABET_SIZE;
-    if (y<32){
-        y+=32;
-    }
-
+    y += 32;
     //printf("f(x): %d\n", y);
     return y;
 }
 
-char dc(char y) {
-    printf("f(x): %d\t", y);
-    char x = (y - key)%ALPHABET_SIZE;
-    printf("%d\n", x);
-    if (x<32) {
-        x+=32;
+int dc(int y) {
+    //printf("f(x): %d\t", y);
+    y -= 32;
+    char x =(y-key)%ALPHABET_SIZE;   
+    if (x<0){  
+        // en C el operador módulo respeta el signo, manejo de casos negativos
+        x += ALPHABET_SIZE;
     }
+    x += 32;
     //printf("x: %d\n", x);
     return x;
 }
@@ -45,7 +45,7 @@ int main() {
     char TEXT[101];
     char* last;
 
-    printf("Enter your message to cipher (100 chars MAX)");
+    printf("Enter your message to cipher (100 chars MAX): ");
     if (fgets(TEXT, 101, stdin) != NULL) {
         if ((last = strchr(TEXT, '\n')) != NULL) {
             *last = '\0';       // reassign pointer's value
