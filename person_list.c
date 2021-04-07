@@ -52,7 +52,7 @@ int deleteByName(char name[], person **head) {
 
     // Edge Case. Empty list.
     if (*head == NULL) {
-        printf("Empty list\n");
+        printf("LISTA ESTÁ VACÍA\n");
         return 0;
     }
     
@@ -76,7 +76,7 @@ int deleteByName(char name[], person **head) {
 
     if (p2==NULL) {
         // reached end of list
-        printf("Person not found\n");
+        printf("PERSONA NO ENCONTRADA\n");
         return 0;
     }
 
@@ -99,7 +99,7 @@ int updateAge(char name[], int age, person **head) {
     p = p->next;
   }
   if (p==NULL) {
-    printf("Person not found\n");
+    printf("PERSONA NO ENCONTRADA\n");
     return 0;
   }
   // else, p->name equals given name

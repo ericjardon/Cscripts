@@ -1,0 +1,32 @@
+Objetivos: archivos a compilar o crear.
+Un objetivo tiene requerimientos o requisitos.
+
+Si la fecha/hora de alguno de los requisitos es posterior a la fecha del objetivo, make lo recrea o recompila.
+En cambio, si el objetivo es posterior a sus requisitos, se considera que ya está actualizado.
+Make siempre lee de arriba para abajo. organiza los objetivos en un DAG o árbol.
+
+El formato de un archivo make es parseado como instrucciones de cómo y en qué orden deben crearse y compilarse archivos. Es decir, 
+ahorra al desarrollador el problema de insertar comandos manualmente cuidando el orden correcto.
+
+Como desde la terminal podemos definir macros, también podemos definirlas desde Make.
+
+La definición de macros se convierte en otro de los comandos a correr como dependencia en el árbol de makefile.
+
+REGLAS BÁSICAS
+- Un archivo .c es el código a compilar y ejecutar. En el árbol de dependencias la raíz se le omite la extensión. 
+- Un archivo .o es código objeto: el output del compilador, el input del editor de ligas. Un archivo .c puede depender de uno o varios .o
+- Un archivo .h propio contiene solamente declaraciones de procedimiento o función.
+- El editor de ligas une las dependencias entre sí, por lo que realmente lo que debe juntar son archivos .o
+
+FLAGS
+-c para compilar y producir un archivo.o
+
+"La herramienta make asegura compilación mínima para el desarrollador de un proyecto"
+
+TAREA
+tar xvf assign4.tar    // para descomprimir .tar
+
+
+Ejem
+ejecutable : main.c suma.c
+    gcc -o suma main.o suma.o
