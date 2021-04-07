@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 int key;
-#define ALPHABET_SIZE 95 // upper limit to ascii table: 127-32
+#define ALPHABET_SIZE 95 // number of valid ASCII character codes
 
 /*Valid ASCII codes go from 32 to 126*/
 int c(int x) {
@@ -40,7 +40,6 @@ void decipher(char* text) {
 }
 
 int main() {
-    // menú de consola, provee una llave y un nombre de archivo
     printf("CEASAR CIPHER\n");
     char TEXT[101];
     char* last;
