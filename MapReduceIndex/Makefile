@@ -12,3 +12,6 @@ main.o: main.c
 
 clean:
 	rm program mapper.o main.o
+
+chunks:
+	rm chunk1.txt chunk2.txt chunk3.txt chunk4.txt
