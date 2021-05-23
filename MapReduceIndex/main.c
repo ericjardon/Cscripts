@@ -103,10 +103,10 @@ int main(int argc, char* argv[]) {
   pid_t child_pid, wpid;
   int status = 0;
 
-  //Father code (before child processes start)
-  //printf("Padre PID: %d\n", getpid());
+  // Father code (before child processes start)
+  printf("Padre PID: %d\n", getpid());
 
-/*   FILE* pointers[NUM_PROC];
+  FILE* pointers[NUM_PROC];
   pointers[0] = fopen("chunk1.txt", "r");
   pointers[1] = fopen("chunk2.txt", "r");
   pointers[2] = fopen("chunk3.txt", "r");
@@ -117,32 +117,20 @@ int main(int argc, char* argv[]) {
       if ((child_pid = fork()) == 0) {
           printf("Hijo %d PID: %d\n", id, getpid());
 
-          chunkMap(id, pointers[id]); // produce A1 and A2 for each chunk
+          chunkMap(id, pointers[id]); // @mapper.c
           fclose(pointers[id]);
           exit(0);
       }
-  } */
+  }
 
   // Wait for all processes
   //while ((wpid = wait(&status)) > 0);
   return 0;
 }
 
-/* IMPRIMIR ARCHIVOS */
+/* IMPRIMIR ARCHIVOS A1 y A2*/
 int printChunk(FILE* ar) {
-  printf("printChunk started\n");
-  int i=0;
-  
-  while (fseek(ar, sizeof(line_record)*i, SEEK_SET) == 0){
-    line_record lr;
-    fread(&lr, sizeof(line_record), 1, ar);
-    if (feof(ar)) { // End of File
-    printf("FINISHED FILE\n");
-      break;
-    }
-    printf("%d: >>%s<<\n" , lr.number,lr.line);
-    i++;
-  }
+  // TODO
   return 0;
 }
 
