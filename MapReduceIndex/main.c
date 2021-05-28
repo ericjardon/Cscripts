@@ -8,14 +8,12 @@
 #include <sys/types.h>
 #include "header.h"
 
-
 #define PRUEBA "prueba.txt"
 #define ALICE "alice.txt"
-#define NUM_PROC 4
 
-//0. Recibe archivo completo y lee línea por línea, llevando un contador de línea. Cada línea se manda en un struct {num_linea, texto} a cada uno de los 4 archivos (chunks), uniformemente.
-//1. Cada mapper recibe su chunk de structs, lee cada uno, tomando nota de los números de línea. Actúa como un inverted index normal y genera sus propios A1 (palabras) y A2 (ocurrencias).
-//3. Desde un programa, recorremos cada uno de los archivos invertidos (A1 y A2 en conjunto) de los mappers, se leen secuencialmente para generar un arreglo ordenado de structs de {palabra, [ocurrencias]}
+// 0. Recibe archivo completo y lee línea por línea, llevando un contador de línea. Cada línea se manda en un struct {num_linea, texto} a cada uno de los 4 archivos (chunks), uniformemente.
+// 1. Cada mapper recibe su chunk de structs, lee cada uno, tomando nota de los números de línea. Actúa como un inverted index normal y genera sus propios A1 (palabras) y A2 (ocurrencias).
+// 3. Desde un programa, recorremos cada uno de los archivos invertidos (A1 y A2 en conjunto) de los mappers, se leen secuencialmente para generar un arreglo ordenado de structs de {palabra, [ocurrencias]}
 // 4. ordenamos el arreglo con quicksort, lo leemos para reducirlo y escupimos A1 y A2 reducidos final.
 
 typedef struct line_record {
@@ -23,9 +21,9 @@ typedef struct line_record {
     int number;
 } line_record;
 
+
 // Local function declarations
 int printChunk(FILE*);
-
 
 // Function to split input file into 4 chunks
 int splitFile(FILE* file_ptr) {
@@ -50,7 +48,7 @@ int splitFile(FILE* file_ptr) {
     r->number = counter;
 
     if (strcmp("", r->line) != 0) {
-        printf("Write to chunk %d", flag);
+        
         if (flag ==0) {
           // Write string to A
           fprintf(ptr1, "%d ", r->number);
@@ -87,24 +85,22 @@ int splitFile(FILE* file_ptr) {
   fclose(ptr3);
   fclose(ptr4);
   fclose(file_ptr);
+
   return 0;
 }
 
 int main(int argc, char* argv[]) {
-  //int n = atoi(argv[1]);
   FILE* file_ptr;
-  file_ptr = fopen(PRUEBA, "r");
+  file_ptr = fopen(ALICE, "r");
 
   splitFile(file_ptr); 
 
   int n = NUM_PROC;
-  printf("Typed n:%d\n", n);
+ 
 
   pid_t child_pid, wpid;
   int status = 0;
 
-  // Father code (before child processes start)
-  printf("Padre PID: %d\n", getpid());
 
   FILE* pointers[NUM_PROC];
   pointers[0] = fopen("chunk1.txt", "r");
@@ -115,33 +111,21 @@ int main(int argc, char* argv[]) {
   // fork 4 processes
   for (int id=0; id<NUM_PROC; id++) {
       if ((child_pid = fork()) == 0) {
-          printf("Hijo %d PID: %d\n", id, getpid());
+          // printf("Hijo %d PID: %d\n", id, getpid());
 
           chunkMap(id, pointers[id]); // @mapper.c
           fclose(pointers[id]);
           exit(0);
       }
   }
-
   // Wait for all processes
-  //while ((wpid = wait(&status)) > 0);
+  while ((wpid = wait(&status)) > 0);
+
+  // Merge the mappers output and reduce to final binaries
+  reduceFiles();
+
   return 0;
 }
-
-/* IMPRIMIR ARCHIVOS A1 y A2*/
-int printChunk(FILE* ar) {
-  // TODO
-  return 0;
-}
-
-
-  // Separate the file into four different parts
-  // Do two consecutive forks, to create 4 processes
-  // Assign each process to a file pointer
-  // each process calls to mapper() and produces a txt file
-  // after all processes are done, we paste the txts together
-  // The pasted txt is sorted and sent to a reducer
-  // Reducer traverses the list 
 
 //https://experiencia21.tec.mx/courses/110335/assignments/4029500?module_item_id=6914950
 
@@ -155,6 +139,4 @@ int printChunk(FILE* ar) {
 
 */
 
-  // https://stackoverflow.com/questions/5460421/how-do-you-write-a-c-program-to-execute-another-program
-
-  // https://stackoverflow.com/questions/19461744/how-to-make-parent-wait-for-all-child-processes-to-finish
+// https://stackoverflow.com/questions/19461744/how-to-make-parent-wait-for-all-child-processes-to-finish

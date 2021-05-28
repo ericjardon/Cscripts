@@ -8,16 +8,6 @@
 
 /* INVERTED INDEX GENERATOR */
 
-typedef struct record1 {
-  char word[50];    // word key
-  int ptr;      // first position in A2 (head of linked list)
-} record1;
-
-typedef struct record2 {
-  int line; // line number in original file
-  int next; // next position within A2
-} record2;
-
 // DYNAMIC ARRAY FOR record1 STRUCTS
 typedef struct {
   record1* array;  
@@ -45,6 +35,7 @@ void freeArray(Array *a) {
   a->used = a->size = 0;
 }
 
+
 int printFile1(FILE * a1, int id);
 int printFile2(FILE * a2, int id);
 
@@ -56,6 +47,40 @@ int compareUser(const void *v1, const void *v2)
   return strcmp(r1->word, r2->word);
 }
 
+int printFileOne(FILE * a1, int id) {
+  printf("-----A1 ----\n");
+  int i=0;
+  while (fseek(a1, sizeof(record1)*i, SEEK_SET) == 0){
+    record1 r1;
+    fread(&r1, sizeof(record1), 1, a1);
+    if (feof(a1)) {
+      // Indica si tratamos de escribir más allá de EOF
+      break;
+    }
+    printf("%s %d\n",r1.word, r1.ptr);
+    i++;
+  }
+  printf("----END A1----\n");
+  return 0;
+}
+
+
+int printFile2(FILE* a2, int id) {
+  printf("-----BEGIN A2 ----\n");
+  int i=0;
+  while (fseek(a2, sizeof(record2)*i, SEEK_SET) == 0){
+    record2 r2;
+    fread(&r2, sizeof(record2), 1, a2);
+    if (feof(a2)) {
+      // Indica si tratamos de escribir más allá de EOF
+      break;
+    }
+    printf("%d: %d next: %d\n",i, r2.line, r2.next);
+    i++;
+  }
+  printf("----END A2----\n");
+  return 0;
+}
 
 int traverseArchivo1(FILE* ar, char* target) {
   int i = 0;
@@ -74,7 +99,7 @@ int traverseArchivo1(FILE* ar, char* target) {
   return -1;  // not found
 }
 
-
+// MAIN METHOD
 void chunkMap(int id, FILE* chunk) {
   char sid[2];
   sprintf(sid, "%d", id+1);   // int -> string
@@ -82,7 +107,7 @@ void chunkMap(int id, FILE* chunk) {
   char chunk_txt[11] = "chunk"; // chunkX.txt
   strcat(chunk_txt, sid); strcat(chunk_txt, ".txt");
 
-  printf("To read: %s\n", chunk_txt);
+  printf("Mapping chunk: %s\n", chunk_txt);
 
   FILE* toread;
   toread = fopen(chunk_txt, "r");
@@ -92,7 +117,6 @@ void chunkMap(int id, FILE* chunk) {
 
   strcat(name1, sid);
   strcat(name2, sid);
-
   FILE* archivo1 = fopen(name1, "wb+");
   FILE* archivo2 = fopen(name2, "wb+");
   // START PROCESSING
@@ -117,6 +141,8 @@ void chunkMap(int id, FILE* chunk) {
     token = strtok(NULL, s); // Start word by word
     while( token != NULL ) {
       char clean[50];
+      memset(clean,'\0',sizeof(clean));   // reset `clean`
+
       int j = 0;
       for (int i=0; token[i]!='\0'; i++) {
           // convertir mayusculas a minusculas
@@ -188,15 +214,12 @@ void chunkMap(int id, FILE* chunk) {
         }
       }
      
-      memset(clean,'\0',sizeof(clean));   // reset `clean`
       token = strtok(NULL, s); // next token
 
     } // end while for every line
 
   }
-
-  // Sort record1 array
-  qsort(a.array, a.used, sizeof(record1), compareUser);
+  //qsort(a.array, a.used, sizeof(record1), compareUser); 
   fseek(archivo1, 0, SEEK_SET);
   
   // write into A1
@@ -204,13 +227,12 @@ void chunkMap(int id, FILE* chunk) {
     fwrite(&(a.array[i]), sizeof(record1), 1, archivo1);
   }
 
-  // print files before closing to check
-  if (id==0) {
-    printFile1(archivo1, 0);
+  // TEST print chunk 1 txt files
+  if (0) {
+    printFileOne(archivo1, 0);
     putchar('\n');
     printFile2(archivo2, 0);
   }
-
 
   // END PROCESSING
   fclose(archivo1);
@@ -218,36 +240,4 @@ void chunkMap(int id, FILE* chunk) {
   freeArray(&a);
   fclose(toread);
 
-}
-
-
-int printFile1(FILE * a1, int id) {
-  int i=0;
-  
-  while (fseek(a1, sizeof(record1)*i, SEEK_SET) == 0){
-    record1 r1;
-    fread(&r1, sizeof(record1), 1, a1);
-    if (feof(a1)) {
-      // Indica si tratamos de escribir más allá de EOF
-      break;
-    }
-    printf("R1 Word:%s\n R1 ptr: %d\n",r1.word, r1.ptr);
-    i++;
-  }
-  return 0;
-}
-
-int printFile2(FILE* a2, int id) {
-  int i=0;
-  while (fseek(a2, sizeof(record2)*i, SEEK_SET) == 0){
-    record2 r2;
-    fread(&r2, sizeof(record2), 1, a2);
-    if (feof(a2)) {
-      // Indica si tratamos de escribir más allá de EOF
-      break;
-    }
-    printf("R2 %d\t Line occurence: %d\n R2 next: %d\n",i, r2.line, r2.next);
-    i++;
-  }
-  return 0;
 }
